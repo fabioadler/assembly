@@ -1,0 +1,2 @@
+nasm -f win32 -o hello_word.o hello_word.asm
+ld -L C:\windows\system32 -l kernel32 -m i386pe hello_word.o -o hello_word.exe

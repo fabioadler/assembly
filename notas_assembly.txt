@@ -1,0 +1,31 @@
+lf equ 0xA        ;Quebra de linha
+null equ 0xD      ;Final da String
+sys_call equ 0x80 ;Enviar informação ao SO
+sys_exit equ 0x1  ;Codigo de chamada para finalizar |
+sys_read equ 0x3  ;Operação de leitura              | --> EAX
+sys_write equ 0x4 ;Operação de escrita              |
+ret_exit equ 0x0  ;Operação realizada com sucesso |
+std_out equ 0x1   ;Saida pardrão                  | --> EBX
+std_in equ 0x0    ;Endica uma entrada padrão      |
+
+mov eax,dword[x] ;| --> valores das constantes do section .data para os registradores se usa dword[]
+mov ebx,dword[y] ;|
+cmp eax,ebx ;| Semelhante a o if, compara os valores dos registradores
+jg maior         ;saltos condicionais
+mov ecx,msg2     ;je =
+mov edx,tam_msg2 ;jg >
+jmp final        ;jge >=
+                 ;jl <
+                 ;jle <=
+                 ;jne !=
+                 ;salto incondicional
+                 ;jmp (jump) - salto para algum ponto
+                 ;call - funciona como um jump, mas vai e volta para o mesmo local, no final do trexo com: ret
+
+section .data
+	msg db "Qual seu nome: ", lf, null ;Constante da msg
+	tam_msg equ $- msg                 ;Tamanho da constante msg
+
+section .bss    ;Usado para armazenar os valores editaveis (variaveis)
+	nome resb 1 ;nome e uma variabel de bytes
+
