@@ -16,12 +16,19 @@ section .data
     len2 equ $- msg2
     msg3 db "Digite o valor2: ", lf, null
     len3 equ $- msg3
+    msg_resultado db "Resultado da multiplicacao: ", null
+    msg4 db "Fim do programa",lf,null
+    len4 equ $- msg4
+
 
 section .bss
-    buffer_conv resb 0xC
-    tam_var equ 0xA
+    tam_var equ 16
     valor1 resb tam_var
     valor2 resb tam_var
+    buffer_conv   resb 16     ; buffer para converter número -> string
+    buffer_final  resb 64     ; buffer para string final (mensagem + número)
+    temp1         resd 1      ; valor1 convertido
+    resultado_num resd 1      ; resultado da multiplicação
 
 
 section .text
@@ -60,17 +67,89 @@ _start:
     mov edx,tam_var
     int sys_call
 
+    ;converter srings para inteiros
+    push valor1             ;carregar o valor 1 em eax para converter
+    call _convert_str_int   ;chama a função
+    add esp,0x4             ;adiciona 4 em esp
+    mov [temp1],eax         ;move o resultado da conversão de eax para temp1
+
+    push valor2             ;carrega o valor 2 em ebx para converter
+    call _convert_str_int   
+    add esp,0x4
+    mov ebx,eax             ;move o resultado de eax para ebx
+
     ;multiplicando MUL
-    mov eax,valor1 ;carrega o valor 1 em eax
-    mov ebx,valor2 ;carrega o valor 2 em ebx
-    mul ebx        ;realizada a multiplicação
-    mov edi,eax   ;salva o resultado em edi
+    mov eax,[temp1]             ;carrega o valor 1 em eax
+                                ;o valor 2 já está em ebx
+    mul ebx                     ;realizada a multiplicação eax = eax * ebx  (resultado em eax)
+    mov [resultado_num],eax     ;move o resultado de eax para resultado_num
 
+    mov edi,buffer_conv
+    mov eax,[resultado_num]     ;move para e eax o resultado_num para converter em string
+    call _convert_int_str       ;em edi aponta para o inicio da string do número e o numero já convertido está em eax
 
+    mov edi,buffer_final
+    mov esi,msg_resultado       ;primeira string
+    mov edx,buffer_conv         ;seunda string
+    call _concatenar_str        ;resultado está no buffer_final e em edi e o tamanho da string e o mesmo do buffer_final
+
+    mov byte [edi-1],lf         ;adiciona \n no final
+    mov byte [edi],null         ;adiciona o null para identificar o fim da string
+
+    mov eax,sys_write
+    mov ebx,std_out
+    mov ecx,buffer_final
+    mov edx,60
+    int sys_call
+
+    mov eax,sys_write
+    mov ebx,std_out
+    mov ecx,msg4
+    mov edx,len4
+    int sys_call
 
     mov eax,sys_exit
     mov ebx,ret_exit
     int sys_call
+
+; =============================================================
+; Função: _concatenar_str
+; Entrada:
+;   EDI = endereço do buffer de destino (onde o resultado ficará)
+;   ESI = primeira string
+;   EDX = segunda string
+; Saída:
+;   EDI = aponta para o início da string concatenada (null-terminated)
+; =============================================================
+_concatenar_str:
+    push eax
+    push edi
+    push esi
+
+    ; 1. Copia a primeira string para o buffer destino
+.copy1:
+    mov al,[esi]
+    mov [edi],al
+    inc edi
+    inc esi
+    test al,al                  ; para quando encontrar o null
+    jnz .copy1
+    dec edi                     ; volta para o null da primeira string
+
+    ; 2. Copia a segunda string logo após a primeira
+.copy2:
+    mov al,[edx]
+    mov [edi],al
+    inc edi
+    inc edx
+    test al, al
+    jnz .copy2
+
+    ; EDI agora aponta para o final (depois do null)
+    pop esi
+    pop edi                    ; retorna EDI para o início do buffer
+    pop eax
+    ret
 
 _convert_int_str:
     ; --- salva registradores que serão modificados ---
@@ -80,14 +159,12 @@ _convert_int_str:
     push esi                ;salva esi (será usado como ponteiro fonte)
     mov esi,edi             ;esi guarda o endereço inicial do buffer
                             ;será usado depois para mover a string
-    ; --- Coloca o terminador null no final do buffer ---
     mov byte [esi+11],0     ;escreve 0 na posição 11 (último byte)
                             ;byte indica operação de 1 byte
                             ;[esi+11] acessa memória no endereço ESI+11
     ; --- Posiciona o ponteiro no penúltimo byte do buffer ---
     add edi, 10             ;edi aponta para posição 10 (11º byte, índice 10)
                             ;deixa espaço para o último dígito
-    ; --- Define o divisor como 10 (base decimal) ---
     mov ebx, 10             ;ebx = 10, usado para divisões sucessivas
     
 .converte_digito:
@@ -160,7 +237,7 @@ _convert_str_int:
     push ecx        ;ecx multiplicador constante (10)
     push edx        ;não usa diretamente, mas preservador
     push esi        ;ponteiro para percorrer a string
-    mov esi,ebp+8   ;carrega o argumento da pilha
+    mov esi,[ebp+8]   ;carrega o argumento da pilha
                     ;ebp+4 = endereço de retorno
                     ;ebp+8 = primeiro argumento (ponteiro string)
     ; --- Iniciando os acumuladores de constants ---
@@ -171,7 +248,7 @@ _convert_str_int:
 
 .proximo_char:
     ;carrega o caracter atual da string
-    mov bl, esi         ;lê 1 byte da posição apontada esi
+    mov bl,[esi]         ;lê 1 byte da posição apontada esi
                         ;bl = byte menos significativo de ebx
     ;verifica se é o fim da string (null)
     test bl,bl          ;testa se bl é zero (and lógico)
@@ -204,10 +281,10 @@ _convert_str_int:
 
 .fim_conversao:
     ; --- Restaura registradores na ordem inversa ---
-    pop esi         ;restaura ESI original
-    pop edx         ;restaura EDX
-    pop ecx         ;restaura ECX
-    pop ebx         ;restaura EBX
-    pop ebp         ;restaura EBP original
+    pop esi         ;restaura esi original
+    pop edx         ;restaura edx
+    pop ecx         ;restaura ecx
+    pop ebx         ;restaura ebx
+    pop ebp         ;restaura ebp original
     ret             ;retorna ao chamador
                     ;eax contém o número convertido
