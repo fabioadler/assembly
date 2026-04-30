@@ -1,0 +1,4 @@
+Para compilar os arquivos .asm no windows você vai precisar ter nasm e o ld instalados no seu windows
+
+nasm -f win32 -o [arquivo objeto a ser gerado.o] [arquivo.asm]
+ld -L C:\windows\system32 -l kernel32 -m i386pe [aquivo objeto.o] -o [arquivo executavel a ser gerado.exe]

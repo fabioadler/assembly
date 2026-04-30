@@ -1,0 +1,10 @@
+Para compilar os arquivos no asm no linux siga os seguintes passos:
+
+Vocẽ precisara ter instalar os seguintes pacotes (no caso para distros que usam apt):
+sudo apt install build-essential binutils nasm -y
+
+Para compilar siga os seguintes passos:
+nasm -f elf64 [arquivo.asm] -o [o arquivo a ser gerado.o]
+ld [arquivo.o] -o [arquivo executavel]
+sudo chmod u+x [arquivo executavel]
+./[arquivo executavel]
