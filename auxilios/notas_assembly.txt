@@ -8,9 +8,15 @@ ret_exit equ 0x0  ;Operação realizada com sucesso |
 std_out equ 0x1   ;Saida pardrão                  | --> EBX
 std_in equ 0x0    ;Endica uma entrada padrão      |
 
+db 1 byte
+dw difine word 1 char 2 bytes
+dd difine double word 4 bytes 
+dq difine quadre word 8 bytes
+dt difine ten word 10 bytes
+
 mov eax,dword[x] ;| --> valores das constantes do section .data para os registradores se usa dword[]
 mov ebx,dword[y] ;|
-cmp eax,ebx ;| Semelhante a o if, compara os valores dos registradores
+cmp eax,ebx      ;| Semelhante a o if, compara os valores dos registradores
 jg maior         ;saltos condicionais
 mov ecx,msg2     ;je =
 mov edx,tam_msg2 ;jg >

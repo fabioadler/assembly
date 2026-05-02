@@ -5,11 +5,11 @@ sudo apt install build-essential binutils gcc-multilib nasm -y
 
 Para compilar siga os seguintes passos:
 nasm -f elf64 [arquivo.asm] -o [o arquivo a ser gerado.o]
-ou
-nasm -f elf32 [arquivo.asm] -o [o arquivo a ser gerado.o]
-
 ld [arquivo.o] -o [arquivo executavel]
+
 ou
+
+nasm -f elf32 [arquivo.asm] -o [o arquivo a ser gerado.o]
 ld -m elf_i386 [arquivo.o] -o [arquivo executavel]
 
 sudo chmod u+x [arquivo executavel]
