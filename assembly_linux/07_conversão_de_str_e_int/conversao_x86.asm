@@ -17,7 +17,7 @@ section .data
     
 section .bss
     buffer resb 0x80
-    buffer2 resb 0xB
+    buffer2 resb 0xC
     valor1 resb 0xA
     valor2 resb 0xA
     resultado resb 0xA
@@ -67,20 +67,18 @@ _start:
     mov [resultado],eax
 
     ;Vamos converter de volta para string
-    mov esi,resultado
-    call int_to_str         ;Resultado está em buffer e o tamanho dele e o tamanho reservado
+    mov eax,[resultado]
+    call int_to_str ;Na said temo em ecx = o resultado, edx = tamanho da str
 
     mov eax,0x4
     mov ebx,0x1
-    mov ecx,buffer
-    mov edx,0x80
     int 0x80
 
     jmp exit
 
 str_to_int:
     mov eax,0x0
-    mov ecx,0xA             ;Determinamos que ecx vai armazenar o valor 10 = 0xA, para multiplicarmos depois
+    mov ebx,0xA             ;Determinamos que ecx vai armazenar o valor 10 = 0xA, para multiplicarmos depois
 
 .loop_str_to_int:           ;Também e um ponto de codigo só coloquei um ponto na frente
     movzx edx,byte [esi]    ;Pega o próximo caractere
@@ -95,7 +93,7 @@ str_to_int:
     cmp dl,9                ;Verificar e o valor e maior que 9
     jg .fim                 ;Se for pular para
     ;Aqui vamos converter o caractere
-    imul eax,ecx            ;multiplica o eax por ecx. eax = eax * 10
+    imul eax,ebx            ;multiplica o eax por ecx. eax = eax * 10
     add eax,edx             ;soma eax e edx. eax = eax + dígito
     jmp .loop_str_to_int
 
@@ -103,7 +101,25 @@ str_to_int:
     ret
 
 int_to_str:
-    mov ecx, buffer2 + 0xB
+    mov ecx,buffer2 + 0xB   ;começa do fim do buffer
+    mov byte [ecx],0x0      ;Adiciona 0x0 como ultimo caracter para encerrar a string
+    mov ebx,0xA             ;Guarda o valor de 10 em ebx pra dividir depois
+
+.loop_int_to_str:
+    mov edx,0                   ;Começa no fim do buffer
+    div ebx                     ;eax / 10 -> eax = quociente, edx = resto
+    add dl,'0'                  ;Converte resto para ASCII
+    dec ecx                     ;Decrementa -1 em ecx, anda uma posição de 1 byte para trás no buffer
+    mov [ecx],dl            
+    test eax,eax                ;testa eax
+    jnz .loop_int_to_str        ;Se for diferente 0 = 0x0, volta para o inicio do loop
+
+    mov byte [buffer2+0xB],0xA  ;adiciona no byte 11 o valor que 10, que muda o byte 11 que ante era 0x0 = 0 ou null (fim da string) em 0xA = 10 ou \n (quebra de linha)
+    mov byte [buffer2+0xC],0X0  ;adiciona no byte 12 (que e o ultimo do buffer2) o 0x0 = 0 ou fim da string
+    ;calcular tamanho do buffer
+    mov edx,buffer2+0xC
+    sub edx,ecx             ;tamanho = final - inicio
+    ret
 
 exit:
     mov eax,sys_exit
