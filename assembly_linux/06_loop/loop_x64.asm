@@ -23,9 +23,9 @@ _start:
     int 0x80
 
 .loop:
-    mov rax,rsi                 ;carreganos o valor de esi em eax, para não alterarmos o valor de esi 
+    mov rax,rsi                 ;carreganos o valor de esi em rax, para não alterarmos o valor de rsi 
     add rax,'0'                 ;Adicionamos um '0' dessa forma, para convertermos para str
-    mov [num],rax               ;Carregamos o conteudo de eax no endereço de memoria que reservamos para num
+    mov [num],rax               ;Carregamos o conteudo de rax no endereço de memoria que reservamos para num
     mov byte [num+1],0xA        ;Adicionamos mais um caracter 1 byte a frente 0xA = 10, que siginifica uma quebra de linha ou \n
     mov byte [num+2],0x0        ;Adicionamos um caracter na frente do ultimo que adicionamos acima, ou seja pegamo o endereo atual e colocamos +2 que são 2 bytes a frente, adicionamos um 0x0 = 0 que siginifica que a string acabou
 
@@ -35,7 +35,7 @@ _start:
 
     cmp rsi,rdi                 ;Confere se o valor de esi atual e igual ao de edi que passamos antés call para chamar a funão
     je .fim_loop                ;Se a confição for verdadeira pular para o .fim_loop
-    inc rsi                     ;Incrementa esi com +1
+    inc rsi                     ;Incrementa rsi com +1
     jmp .loop                   ;Volta para o loop novamente
 
 .fim_loop:

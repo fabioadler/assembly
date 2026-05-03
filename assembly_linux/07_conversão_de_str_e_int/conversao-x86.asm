@@ -17,6 +17,7 @@ section .data
     
 section .bss
     buffer resb 0x80
+    buffer2 resb 0xB
     valor1 resb 0xA
     valor2 resb 0xA
     resultado resb 0xA
@@ -66,7 +67,14 @@ _start:
     mov [resultado],eax
 
     ;Vamos converter de volta para string
-    
+    mov esi,resultado
+    call int_to_str         ;Resultado está em buffer e o tamanho dele e o tamanho reservado
+
+    mov eax,0x4
+    mov ebx,0x1
+    mov ecx,buffer
+    mov edx,0x80
+    int 0x80
 
     jmp exit
 
@@ -91,8 +99,11 @@ str_to_int:
     add eax,edx             ;soma eax e edx. eax = eax + dígito
     jmp .loop_str_to_int
 
-.fim
+.fim:
     ret
+
+int_to_str:
+    mov ecx, buffer2 + 0xB
 
 exit:
     mov eax,sys_exit
