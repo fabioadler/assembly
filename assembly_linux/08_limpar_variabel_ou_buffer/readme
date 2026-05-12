@@ -1,0 +1,8 @@
+Dessa vez vamos fazer algumas coisas diferentes!
+
+1º Não vamos usar mais os valores que definiamos como constantes antés.
+2º Vamos mudar o nome de onde do ponto de onde o nosso codigo começa a ser executado, normalmente o ld (O nosso linker) aponta para o ponto _start, então veja a baixo como podemos mudar isso:
+    nasm -f elf32 limpa_x86.asm -o limpa_x86.o 
+    ld -m elf_i386 limpa_x86.o -o limpa_x86 -e _inicio  -> aqui quando passamos para o ld o -e estamos dizendo para ele que vamos passar um novo ponto de onde nosso codigo vai começar a ser executado.
+
+3º Vou mudar um pouco a formatação de como crio os pontos (Não muda a forma de execução ou seja não afeta o codigo).
