@@ -1,0 +1,20 @@
+Vamos começar compilando os arquivos para as arquiteturas que demonstamos aqui no repositorio.
+nasm -f [A arquitetura desejada] [arquivo.asm] -o [o arquivo que vai ser gerado.o] -> Com esse comando já criamos o arquivo binario geralmente criamos no formato .o (conhecido também com arquivo objeto), vou demostrar alguns exemplos abaixo
+nasm -f elf32 teste.asm -o teste.o -> para 32bits
+nasm -f elf64 teste.asm -o teste.o -> para 64bits
+nasm -f bin   teste.asm -o teste.bin -> Um arquivo de binario puro e não pode ser executado diretamente, ele necessita que teja um apontamento para sua execução, ou estar em uma parte de especifica de uma unidade de armazenamento (ROM) sendo SSD,HD,Pendrive ou EPROM, que estando em uma posição especifica da memoria podendo ser executado, podendo ser um arquivo de bios, bootloader e etc... Lembrando o usuo varia muito, mais cada uso tem suas peculiariades
+
+Vamos ver a respeito de linker agora:
+* O linker (ou editor de ligação) é o programa responsável por pegar os arquivos objeto gerados pelo compilador e transformá-los em um único arquivo executável.
+* Une os módulos: Junta os arquivos objeto (gerados a partir do código-fonte) e os arquivos de biblioteca necessários para o programa rodar.
+* Resolve referências (Símbolos): Ele associa as chamadas de funções e dados que estão em um arquivo, mas foram definidos em outro, garantindo que o programa saiba onde encontrar tudo.
+* Relocalização de Endereços: Define o endereço de memória final para cada parte do programa. Como os arquivos objeto começam com endereço zero, o linker organiza onde cada módulo ficará no executável final.
+* Cria o Executável: Gera o arquivo final (como um .exe no Windows ou um binário no Linux) pronto para ser carregado na memória e executado.
+* Verificação de erros: Se uma função foi chamada, mas nunca definida, o linker emite um erro (conhecido como linker error), pois ele não consegue "vincular" a chamada ao seu código.
+
+Essas informações vocês conseguem achar facilmente em uma pesquisa na internet.
+Vamos lá, nós exemplos usamos o linker ld.
+
+ld -m [a arquitetura] [arquivo.o] -o [o arquivo binario executavel] -> o arquivo final poder ser um .exe ou não isso fica a seu criterio.
+ld -m elf_i386 teste.o -o teste -> 32bits
+ld -m elf_x86_64 teste.o -o teste | ld teste.o -o teste -> 64bits

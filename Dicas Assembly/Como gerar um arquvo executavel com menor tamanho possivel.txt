@@ -1,0 +1,3 @@
+No ld quando usamos o argumento -s, o ld remove a tabela de símbolos (symbol table) e informações de depuração, gerando um binário menor e mais difícil de sofrer engenharia reserva.
+
+ld -m elf_i386 teste.o -o teste -s -> exemplo

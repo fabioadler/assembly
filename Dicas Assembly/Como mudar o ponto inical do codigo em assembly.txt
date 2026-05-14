@@ -1,0 +1,16 @@
+Para fazer isso temos que fazer 2 mudanças:
+
+section .text
+global _inicio -> 1º A nossa primeira alteração dentro do nosso codigo dentro da parte de codigo, temos que mudar o nosso global que e reponsavel por aponta para o ponto inical do codigo.
+
+_inicio:       -> 2º Ter o ponto criado no codigo
+
+
+Agora vamos gerar o arquivo.o normalmente.
+
+nasm -f elf32 teste.asm -o teste.o
+
+Agora vamos ter que informar o novo ponto para o nosso linker ld, vamos isso passando o argumento -e, que ele vai subistituir o ponto padrão que seria o _start para o que nos passamos, pondendo ser qualquer outro.
+
+ld -m elf_i386 teste.o -o teste -e _inicio -> 3º aponta para o nosso novo ponto de inicio.
+
